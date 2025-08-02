@@ -26,5 +26,5 @@ class EmployeeNotifier:
                 tg = str(emp.get(self.telegram_key, "")).strip()
                 if tg:
                     mentions.append(tg if tg.isdigit() else f"@{tg}")
-        self.logger.debug(f'Список активных сотрудников: {' '.join(mentions)}')
+        self.logger.debug(f'Список активных сотрудников: {" ".join(mentions)}')
         return mentions
