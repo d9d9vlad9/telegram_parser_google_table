@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from zoneinfo import ZoneInfo
 
 load_dotenv()
 
@@ -17,6 +18,14 @@ CHECK_INTERVAL = int(os.getenv("CHECK_INTERVAL", "60"))
 # ==========================
 # Уровень логирования: DEBUG, INFO, WARNING, ERROR, CRITICAL
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
+
+# ==========================
+# Таймзона для сравнения времени задач из Google Sheets с текущим временем
+# Укажи свою зону из списка: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+# Примеры: UTC, Europe/Moscow, Asia/Yekaterinburg
+# ==========================
+TIMEZONE = os.getenv("TIMEZONE", "UTC")
+ZONE = ZoneInfo(TIMEZONE)
 
 # ==========================
 # Названия листов для таблицы

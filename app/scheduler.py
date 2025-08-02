@@ -2,12 +2,14 @@ import datetime
 import asyncio
 import json
 import logging
-from .config import CHECK_INTERVAL, COLUMN_ACTIVE, COLUMN_TELEGRAM, MSG_START, MSG_EXECUTION
+from .config import CHECK_INTERVAL, COLUMN_ACTIVE, COLUMN_TELEGRAM, MSG_START, MSG_EXECUTION, ZONE
 from .employee_notifier import EmployeeNotifier
 from .get_active_task import get_active_tasks_for_now
 from .sheets_service import SheetsService
 from .notifier import Notifier
 from .task_processor import TaskProcessor
+from zoneinfo import ZoneInfo
+
 
 logger = logging.getLogger(__name__)
 
@@ -59,7 +61,7 @@ class Scheduler:
         """
         Отправляет приветственное сообщение при запуске бота.
         """
-        now = datetime.datetime.now().strftime("%d.%m.%Y %H:%M")
+        now = datetime.datetime.now(ZoneInfo("UTC")).astimezone(ZONE).strftime("%d.%m.%Y %H:%M")
         text = (
             f"🤖 <b>Бот запущен и готов к работе!</b>\n"
             f"Сегодня: <b>{now}</b>\n\n"

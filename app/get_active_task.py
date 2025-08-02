@@ -1,10 +1,12 @@
 from datetime import datetime
+from zoneinfo import ZoneInfo
 import logging
 from .config import (
     COLUMN_NUMBER,
     COLUMN_WORK_NAME,
     COLUMN_START_TIME,
     COLUMN_FINISH_TIME,
+    ZONE,
 )
 
 
@@ -33,7 +35,7 @@ def get_active_tasks_for_now(data):
 
     date_row = data[1]
     header = data[0]
-    today_str = datetime.now().strftime("%d.%m.%Y")
+    today_str = datetime.now(ZoneInfo("UTC")).astimezone(ZONE).strftime("%d.%m.%Y")
     logger.info(f"Ищем колонку с сегодняшней датой: {today_str}")
 
     def find_col_index(head, col_name):
@@ -67,8 +69,10 @@ def get_active_tasks_for_now(data):
         logger.warning(f"Столбец с датой {today_str} не найден")
         return []
 
-    now_str = datetime.now().strftime("%H:%M")
+    now_str = datetime.now(ZoneInfo("UTC")).astimezone(ZONE).strftime("%H:%M")
     logger.info(f"Текущее время для сравнения: {now_str}")
+    utc_now = datetime.now(ZoneInfo("UTC")).strftime("%H:%M")
+    logger.debug(f"Текущее UTC: {utc_now}, локальное: {now_str}, зона: {ZONE}")
 
     active_tasks = []
 
