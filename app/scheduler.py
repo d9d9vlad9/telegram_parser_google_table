@@ -39,6 +39,7 @@ class Scheduler:
         self.already_notified = set()
         self.task_processor = TaskProcessor("date")
         self.employee_notifier = EmployeeNotifier(COLUMN_ACTIVE, COLUMN_TELEGRAM)
+        self.last_date = None
         logger.info("Scheduler initialized")
 
     async def run(self):
@@ -74,6 +75,12 @@ class Scheduler:
         Выполняет проверку текущих активных задач,
         группирует их и отправляет уведомления ответственным сотрудникам.
         """
+        current_date = datetime.datetime.now(ZoneInfo("UTC")).astimezone(ZONE).date()
+        if self.last_date != current_date:
+            logger.info("Новый день — очищаем список already_notified")
+            self.already_notified.clear()
+            self.last_date = current_date
+
         data = self.sheets.get_tasks()
         employees = self.sheets.get_employees()
 
@@ -89,10 +96,13 @@ class Scheduler:
 
         for (stage, task_time), tasks in grouped_tasks.items():
             message = self._build_message(stage, task_time, tasks, mentions)
-            notify_key = f"{stage}:{task_time}"
+            notify_key = f"{current_date}:{stage}:{task_time}"
+
             if notify_key in self.already_notified:
+                logger.debug(f"Пропускаем уведомление: {notify_key} уже отправлялось")
                 continue
 
+            logger.info(f"Отправляем уведомление: {notify_key}")
             await self.notifier.send_group_message(message)
             self.already_notified.add(notify_key)
 
